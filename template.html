@@ -57,7 +57,7 @@ tr:last-child td{border-bottom:0}
 </div>
 
 <div class="card section"><h2>Všechny strategie</h2><div class="scroll"><table id="t_all"></table></div>
-  <div class="note" style="margin-top:8px">„Papír“ = výsledek spočtený z tržních cen podle signálu, bez obchodu. „Demo“ = skutečné obchody na demo účtu MT5 (PurpleTrading) – skutečné ceny, spread a poplatky, ale fiktivní peníze. Žádná strategie zatím neobchoduje reálné peníze.</div></div>
+  <div class="note" style="margin-top:8px">„Papír“ = výsledek spočtený z tržních cen podle signálu, bez obchodu. „Demo“ = skutečné obchody na demo účtu MT5 (PurpleTrading) – skutečné ceny, spread a poplatky, ale fiktivní peníze. Žádná strategie zatím neobchoduje reálné peníze. *Úspěšnost = podíl ziskových nocí z nocí, kdy strategie měla pozici.</div></div>
 
 <div class="grid g2 section">
   <div class="card"><h2>DEMO · Zlato v5 po reopenu (MT5) <span class="tag">XAUUSD_ecn</span></h2>
@@ -153,7 +153,7 @@ drawAll();addEventListener('resize',()=>{clearTimeout(window._t);window._t=setTi
   r.push(['<span class="dot" style="background:#c9a227"></span>Zlato v5 po reopenu','Demo MT5','XAUUSD_ecn 23:00/00:00 CZ→exit v5',dg.n,dg.cum_pct,dg.win_pct,dg.maxdd_pct,dg.last_pct,dg.open?dg.open.phase:'čeká']);
   r.push(['<span class="dot" style="background:#4f8cff"></span>Indexy noc a-015','Demo MT5','US500+US100 18:01→09:00 NY',di.n,di.cum_pct,di.win_pct,di.maxdd_pct,di.last_pct,di.open?Object.values(di.open.legs||{}).join('/'):'čeká']);
   r.push(['<span class="dot" style="background:#9aa7bd"></span>d-040 dluhopisy','Papír','TLT poslední 3 dny měsíce',d4.n,d4.cum_pct,d4.win_pct,d4.maxdd_pct,d4.last_pct,d4.open_window?('okno '+d4.open_window+(d4.open_sold?' prodáno':' otevřeno')):'čeká']);
-  $('t_all').innerHTML='<tr><th>Strategie</th><th style="text-align:left">Typ</th><th style="text-align:left">Co dělá</th><th>Obchodů</th><th>Celkem</th><th>Úspěšnost</th><th>Max propad</th><th>Poslední</th><th>Stav</th></tr>'+
+  $('t_all').innerHTML='<tr><th>Strategie</th><th style="text-align:left">Typ</th><th style="text-align:left">Co dělá</th><th>Nocí</th><th>Celkem</th><th>Úspěšnost*</th><th>Max propad</th><th>Poslední</th><th>Stav</th></tr>'+
    r.map(x=>`<tr><td>${x[0]}</td><td style="text-align:left">${x[1]}</td><td style="text-align:left" class="mut">${x[2]}</td><td>${x[3]}</td><td class="${cls(x[4])}">${f(x[4])} %</td><td>${x[5]==null?'–':x[5].toFixed(0)+' %'}</td><td class="neg">${x[6]==null||x[3]==0?'–':x[6].toFixed(2)+' %'}</td><td class="${cls(x[7])}">${f(x[7])} %</td><td class="mut">${x[8]}</td></tr>`).join('');
 })();
 // book
