@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PineLab · Přehled strategií</title>
+<meta http-equiv="refresh" content="900"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%274%27 fill=%27%234f8cff%27/%3E%3Cpath d=%27M3 11l3-3 2 2 5-5%27 stroke=%27white%27 stroke-width=%271.8%27 fill=%27none%27/%3E%3C/svg%3E">
+<style>
+:root{--bg:#0b0f17;--panel:#121826;--panel2:#171f30;--line:#232c40;--txt:#e6eaf2;--mut:#8b95a9;--pos:#2ecc71;--neg:#ff5d5d;--warn:#f5b041;--acc:#4f8cff}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+a{color:var(--acc)}
+.wrap{max-width:1240px;margin:0 auto;padding:22px 18px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-size:22px;margin:0;font-weight:650;letter-spacing:.2px}h1 span{color:var(--mut);font-weight:400}
+h2{font-size:15px;margin:0 0 12px;font-weight:600;color:#cdd5e4}
+.sub{color:var(--mut);font-size:12.5px}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid var(--line);background:var(--panel2);color:var(--mut)}
+.pill.ok{color:#bff5d5;border-color:#1f6b43;background:#0f2c1e}.pill.bad{color:#ffd0d0;border-color:#7a2a2a;background:#2c1212}.pill.warn{color:#ffe6b8;border-color:#7a5a1d;background:#2c2212}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:1.25fr 1fr}
+@media(max-width:980px){.g4,.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+@media(max-width:560px){.g4,.g3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px}
+.kpi .lab{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+.kpi .val{font-size:26px;font-weight:650;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .foot{color:var(--mut);font-size:12px;margin-top:2px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.mut{color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{color:var(--mut);font-weight:500;font-size:12px;text-align:right;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid #1a2233;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+tr:last-child td{border-bottom:0}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.chart{width:100%;height:280px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--mut)}
+.section{margin-top:16px}
+.scroll{overflow-x:auto}
+.note{color:var(--mut);font-size:12.5px;line-height:1.55}
+.tag{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-left:6px}
+.big{font-size:18px;font-weight:600}
+.row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed #1f283b}.row:last-child{border:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><h1>PineLab <span>· přehled všech strategií</span></h1>
+  <div class="sub" id="built"></div></div>
+  <div id="health"></div>
+</header>
+
+<div class="grid g4" id="kpis"></div>
+
+<div class="grid g2 section">
+  <div class="card"><h2>Vývoj papírových strategií zlata (forward, od 5. 10. 2026) <span class="tag">% účtu, náklady 0.40 USD/oz</span></h2>
+    <svg class="chart" id="ch_paper"></svg><div class="legend" id="lg_paper"></div></div>
+  <div class="card"><h2>Dnešní noc</h2><div id="tonight"></div></div>
+</div>
+
+<div class="card section"><h2>Všechny strategie</h2><div class="scroll"><table id="t_all"></table></div>
+  <div class="note" style="margin-top:8px">„Papír“ = výsledek spočtený z tržních cen podle signálu, bez obchodu. „Demo“ = skutečné obchody na demo účtu MT5 (PurpleTrading) – skutečné ceny, spread a poplatky, ale fiktivní peníze. Žádná strategie zatím neobchoduje reálné peníze.</div></div>
+
+<div class="grid g2 section">
+  <div class="card"><h2>DEMO · Zlato v5 po reopenu (MT5) <span class="tag">XAUUSD_ecn</span></h2>
+    <svg class="chart" id="ch_gold" style="height:200px"></svg><div id="gold_info"></div></div>
+  <div class="card"><h2>DEMO · Indexy noc a-015 (MT5) <span class="tag">US500 + US100</span></h2>
+    <svg class="chart" id="ch_index" style="height:200px"></svg><div id="index_info"></div></div>
+</div>
+
+<div class="grid g2 section">
+  <div class="card"><h2>Poslední noci (papír)</h2><div class="scroll"><table id="t_book"></table></div></div>
+  <div class="card"><h2>PAPÍR · d-040 dluhopisy na konci měsíce <span class="tag">TLT, 24 oken</span></h2><div id="d040"></div>
+    <h2 style="margin-top:18px">Pravidla hodnocení</h2>
+    <div class="note">Krátké období nic nedokazuje: 15–40 nocí je statisticky šum. Rozhoduje se až po předem stanoveném počtu nocí (zlato demo ≥ 60 nocí, indexy ≥ 40 nocí, nejdříve 31. 1. 2027; d-040 po 24 měsících). Pravidla strategií se podle výsledků neladí.</div></div>
+</div>
+</div>
+<script>
+const D=/*__DATA__*/null;
+const $=id=>document.getElementById(id);
+const f=(x,d=2,s=true)=>x==null||isNaN(x)?'–':((s&&x>0?'+':'')+x.toFixed(d));
+const cls=x=>x==null?'mut':(x>0?'pos':(x<0?'neg':'mut'));
+const czk=x=>x==null?'–':(x>0?'+':'')+Math.round(x).toLocaleString('cs-CZ')+' Kč';
+function ago(iso){if(!iso)return null;return (Date.now()-new Date(iso).getTime())/60000}
+$('built').textContent='Aktualizováno '+D.built_cz+' (stránka se sama obnovuje)';
+// health
+(function(){
+  const h=[];const hb=D.heartbeat||{};const cl=D.cloud||{};
+  const a=ago(hb.utc);const c=ago(cl.utc);
+  if(c!=null&&c<30)h.push('<span class="pill ok">cloud automat běží</span>');
+  else if(a!=null&&a<40)h.push('<span class="pill ok">PC automat online</span>');
+  else if(a!=null)h.push('<span class="pill warn">automat offline '+Math.round(a/60)+' h</span>');
+  else h.push('<span class="pill warn">automat: zatím bez hlášení</span>');
+  h.push(D.last_signal?'<span class="pill ok">signál '+D.last_signal+'</span>':'<span class="pill bad">bez signálu</span>');
+  if(!D.prices_ok)h.push('<span class="pill warn">ceny: použita cache</span>');
+  $('health').innerHTML=h.join(' ');
+})();
+// KPIs
+(function(){
+  const p=D.paper.v5,g=D.paper.gold,dg=D.demo_gold,di=D.demo_index;
+  const k=[
+   ['Papír v5 (zlato)',f(p.cum_pct)+' %',cls(p.cum_pct),p.n+' nocí · max propad '+f(p.maxdd_pct,2,false)+' %'],
+   ['Zlato 1× stejné noci',f(g.cum_pct)+' %',cls(g.cum_pct),'srovnání bez páky a nákladů'],
+   ['Demo zlato (MT5)',czk(dg.net_czk),cls(dg.net_czk),dg.n+' obchodů · náklad '+(dg.cost_median==null?'–':dg.cost_median.toFixed(2)+' USD/oz')],
+   ['Demo indexy (MT5)',czk(di.net_czk),cls(di.net_czk),di.n+' nocí · kapitál '+Math.round(di.capital_czk).toLocaleString('cs-CZ')+' Kč']];
+  $('kpis').innerHTML=k.map(x=>`<div class="card kpi"><div class="lab">${x[0]}</div><div class="val ${x[2]}">${x[1]}</div><div class="foot">${x[3]}</div></div>`).join('');
+})();
+// chart
+function chart(svgId,series,legId){
+  const svg=$(svgId);const W=svg.clientWidth||600,H=svg.clientHeight||260,P={l:44,r:12,t:12,b:26};
+  const all=series.flatMap(s=>s.pts);
+  if(!all.length){svg.innerHTML=`<text x="${W/2}" y="${H/2}" fill="#8b95a9" text-anchor="middle" font-size="13">Zatím žádná uzavřená noc – první data přibudou ráno.</text>`;if(legId)$(legId).innerHTML='';return}
+  const xs=[...new Set(all.map(p=>p[0]))].sort();const xi=Object.fromEntries(xs.map((x,i)=>[x,i]));
+  let lo=Math.min(0,...all.map(p=>p[1])),hi=Math.max(0,...all.map(p=>p[1]));if(hi-lo<0.2){hi+=0.1;lo-=0.1}
+  const pad=(hi-lo)*0.08;lo-=pad;hi+=pad;
+  const X=i=>P.l+(xs.length<2?0.5:i/(xs.length-1))*(W-P.l-P.r),Y=v=>P.t+(hi-v)/(hi-lo)*(H-P.t-P.b);
+  let g='';const ticks=5;
+  for(let i=0;i<=ticks;i++){const v=lo+(hi-lo)*i/ticks;g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#1d2536"/><text x="${P.l-6}" y="${Y(v)+4}" fill="#8b95a9" font-size="11" text-anchor="end">${v.toFixed(2)}%</text>`}
+  g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(0)}" y2="${Y(0)}" stroke="#3a4560"/>`;
+  const step=Math.max(1,Math.ceil(xs.length/7));
+  xs.forEach((x,i)=>{if(i%step==0||i==xs.length-1)g+=`<text x="${X(i)}" y="${H-7}" fill="#8b95a9" font-size="11" text-anchor="middle">${x.slice(5)}</text>`});
+  for(const s of series){if(!s.pts.length)continue;
+    const d=s.pts.map((p,j)=>(j?'L':'M')+X(xi[p[0]]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ');
+    g+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.w||2}" ${s.dash?'stroke-dasharray="5 4"':''} stroke-linejoin="round"/>`;
+    const l=s.pts[s.pts.length-1];g+=`<circle cx="${X(xi[l[0]])}" cy="${Y(l[1])}" r="3" fill="${s.color}"/>`}
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML=g;
+  if(legId)$(legId).innerHTML=series.map(s=>`<span><span class="dot" style="background:${s.color}"></span>${s.name} <b class="${cls(s.pts.length?s.pts[s.pts.length-1][1]:null)}">${s.pts.length?f(s.pts[s.pts.length-1][1])+' %':'–'}</b></span>`).join('');
+}
+function drawAll(){
+  const ser=['v5','R043','R045','R20C','gold'].map(a=>({name:D.paper[a].name.split(' (')[0],color:D.paper[a].color,pts:D.paper[a].curve,dash:a=='gold',w:a=='v5'?2.6:1.6}));
+  chart('ch_paper',ser,'lg_paper');
+  chart('ch_gold',[{name:'demo zlato',color:'#c9a227',pts:D.demo_gold.curve,w:2.4}]);
+  chart('ch_index',[{name:'demo indexy',color:'#4f8cff',pts:D.demo_index.curve,w:2.4}]);
+}
+drawAll();addEventListener('resize',()=>{clearTimeout(window._t);window._t=setTimeout(drawAll,150)});
+// tonight
+(function(){
+  const t=D.tonight;if(!t){$('tonight').innerHTML='<div class="mut">Zatím žádný signál.</div>';return}
+  const st={'UZAVŘENO':'ok','OTEVŘENO':'warn'}[t.state]||'bad';
+  let h=`<div class="row"><span>Noc</span><span class="big">${t.D} <span class="pill ${st}">${t.state}</span></span></div>`;
+  h+=`<div class="row"><span>Nákup (papír)</span><span>22:00 CZ · 16:00 NY</span></div><div class="row"><span>Prodej</span><span>${t.exit_cz} CZ · ${String(t.exit_ny).padStart(2,'0')}:00 NY</span></div>`;
+  h+=`<div class="row"><span>Síla signálu v5</span><span>${t.dec==null?'–':t.dec.toFixed(2)} / 2</span></div>`;
+  for(const a of ['v5','R043','R045','R20C'])h+=`<div class="row"><span>Páka ${a}</span><span>${t.paka[a]==null?'–':t.paka[a].toFixed(3)+'×'}</span></div>`;
+  const og=D.demo_gold.open,oi=D.demo_index.open;
+  if(og)h+=`<div class="row"><span>Demo zlato</span><span>${og.phase}${og.lots?' · '+og.lots+' lot':''}${og.entry?' @ '+og.entry:''}</span></div>`;
+  if(oi)h+=`<div class="row"><span>Demo indexy</span><span>${Object.entries(oi.legs||{}).map(([s,p])=>s.replace('_ecn','')+' '+p).join(' · ')||'–'}</span></div>`;
+  $('tonight').innerHTML=h;
+})();
+// all strategies
+(function(){
+  const r=[];const P=D.paper;
+  for(const a of ['v5','R043','R045','R20C'])r.push([`<span class="dot" style="background:${P[a].color}"></span>${P[a].name}`,'Papír','Zlato noc 22:00→exit',P[a].n,P[a].cum_pct,P[a].win_pct,P[a].maxdd_pct,P[a].last_pct,'běží']);
+  r.push([`<span class="dot" style="background:${P.gold.color}"></span>${P.gold.name}`,'Srovnání','Zlato 16→03 NY 1×',P.gold.n,P.gold.cum_pct,P.gold.win_pct,P.gold.maxdd_pct,P.gold.last_pct,'—']);
+  const dg=D.demo_gold,di=D.demo_index,d4=D.d040;
+  r.push(['<span class="dot" style="background:#c9a227"></span>Zlato v5 po reopenu','Demo MT5','XAUUSD_ecn 23:00/00:00 CZ→exit v5',dg.n,dg.cum_pct,dg.win_pct,dg.maxdd_pct,dg.last_pct,dg.open?dg.open.phase:'čeká']);
+  r.push(['<span class="dot" style="background:#4f8cff"></span>Indexy noc a-015','Demo MT5','US500+US100 18:01→09:00 NY',di.n,di.cum_pct,di.win_pct,di.maxdd_pct,di.last_pct,di.open?Object.values(di.open.legs||{}).join('/'):'čeká']);
+  r.push(['<span class="dot" style="background:#9aa7bd"></span>d-040 dluhopisy','Papír','TLT poslední 3 dny měsíce',d4.n,d4.cum_pct,d4.win_pct,d4.maxdd_pct,d4.last_pct,d4.open_window?('okno '+d4.open_window+(d4.open_sold?' prodáno':' otevřeno')):'čeká']);
+  $('t_all').innerHTML='<tr><th>Strategie</th><th style="text-align:left">Typ</th><th style="text-align:left">Co dělá</th><th>Obchodů</th><th>Celkem</th><th>Úspěšnost</th><th>Max propad</th><th>Poslední</th><th>Stav</th></tr>'+
+   r.map(x=>`<tr><td>${x[0]}</td><td style="text-align:left">${x[1]}</td><td style="text-align:left" class="mut">${x[2]}</td><td>${x[3]}</td><td class="${cls(x[4])}">${f(x[4])} %</td><td>${x[5]==null?'–':x[5].toFixed(0)+' %'}</td><td class="neg">${x[6]==null||x[3]==0?'–':x[6].toFixed(2)+' %'}</td><td class="${cls(x[7])}">${f(x[7])} %</td><td class="mut">${x[8]}</td></tr>`).join('');
+})();
+// book
+(function(){
+  const rows=D.book.slice(0,20);
+  $('t_book').innerHTML='<tr><th>Noc</th><th>Prodej CZ</th><th>Páka v5</th><th>v5</th><th>R043</th><th>R045</th><th>R20C</th><th>Zlato 1×</th></tr>'+
+  rows.map(r=>{if(!r.paka)return `<tr><td>${r.D}</td><td colspan="7" class="mut" style="text-align:left">${r.state}</td></tr>`;
+   const c=a=>r.ret&&r.ret[a]!=null?`<td class="${cls(r.ret[a])}">${f(r.ret[a]*100,2)} %</td>`:`<td class="mut">${r.state=='OTEVŘENO'?'běží':'–'}</td>`;
+   return `<tr><td>${r.D} <span class="mut">${r.dow}</span></td><td>${r.exit_cz}</td><td>${r.paka.v5==null?'–':r.paka.v5.toFixed(2)}×</td>${c('v5')}${c('R043')}${c('R045')}${c('R20C')}${c('gold')}</tr>`}).join('');
+})();
+// demo infos
+(function(){
+  const g=D.demo_gold;let h='';
+  h+=`<div class="row"><span>Výsledek celkem</span><b class="${cls(g.net_czk)}">${czk(g.net_czk)} (${f(g.cum_pct)} %)</b></div>`;
+  h+=`<div class="row"><span>Náklad na obchod (medián / průměr)</span><span>${g.cost_median==null?'–':g.cost_median.toFixed(2)} / ${g.cost_mean==null?'–':g.cost_mean.toFixed(2)} USD/oz <span class="mut">(limit 0.50 / 0.60)</span></span></div>`;
+  h+=`<div class="row"><span>Zmeškané / PC vypnuté / bez signálu</span><span>${g.counts.MISSED} / ${g.counts.PC_OFF} / ${g.counts.NO_SIGNAL+g.counts.FLAT}</span></div>`;
+  if(g.rows.length)h+='<table style="margin-top:8px"><tr><th>Noc</th><th>Lot</th><th>Nákup</th><th>Prodej</th><th>Výsledek</th></tr>'+g.rows.slice(0,8).map(r=>`<tr><td>${r.D}</td><td>${r.lots}</td><td>${r.buy??'–'}</td><td>${r.sell??'–'}</td><td class="${cls(r.net_czk)}">${czk(r.net_czk)}</td></tr>`).join('')+'</table>';
+  $('gold_info').innerHTML=h;
+  const i=D.demo_index;let k='';
+  k+=`<div class="row"><span>Výsledek celkem</span><b class="${cls(i.net_czk)}">${czk(i.net_czk)} (${f(i.cum_pct)} %)</b></div>`;
+  for(const s of ['US500_ecn','US100_ecn']){const c=i.cost[s],sf=i.shortfall[s];k+=`<div class="row"><span>${s.replace('_ecn','')} náklad / skluz vs model</span><span>${c[0]==null?'–':c[0].toFixed(2)} bp / ${sf[1]==null?'–':sf[1].toFixed(2)} bp <span class="mut">(limit skluzu 1.5)</span></span></div>`}
+  k+=`<div class="row"><span>Swap (musí být 0)</span><span class="${i.swap_incidents?'neg':'pos'}">${i.swap_incidents?i.swap_incidents+'× swap!':'0 ✓'}</span></div>`;
+  k+=`<div class="row"><span>Zmeškané / incidenty / svátky</span><span>${i.counts.MISSED+i.counts.BROKER_CLOSED} / ${i.counts.INCIDENT+i.counts.REFUSED} / ${i.counts.FLAT_HOLIDAY}</span></div>`;
+  if(i.rows.length)k+='<table style="margin-top:8px"><tr><th>Noc</th><th>US500 bp</th><th>US100 bp</th><th>Výsledek</th></tr>'+i.rows.slice(0,8).map(r=>`<tr><td>${r.D}</td><td>${f((r.legs.US500_ecn||{}).gross_bp,1)}</td><td>${f((r.legs.US100_ecn||{}).gross_bp,1)}</td><td class="${cls(r.net_czk)}">${czk(r.net_czk)}</td></tr>`).join('')+'</table>';
+  $('index_info').innerHTML=k;
+  const d=D.d040;let m=`<div class="row"><span>Uzavřená okna</span><span>${d.n} / 24</span></div><div class="row"><span>Celkem</span><b class="${cls(d.cum_pct)}">${f(d.cum_pct)} %</b></div>`;
+  if(d.open_window)m+=`<div class="row"><span>Aktuální okno</span><span>${d.open_window} · ${d.open_sold?'prodáno, čeká výsledek':'nakoupeno (papír)'}</span></div>`;
+  m+=d.windows.map(w=>`<div class="row"><span>${w.window}</span><span class="${cls(w.net_pct)}">${f(w.net_pct)} %</span></div>`).join('');
+  $('d040').innerHTML=m;
+})();
+</script>
+</body>
+</html>
