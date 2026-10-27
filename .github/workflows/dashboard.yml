@@ -1,0 +1,54 @@
+name: dashboard
+on:
+  schedule:
+    - cron: "13 * * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: dashboard
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: fetch ledgers (private repo, read only)
+        env:
+          SRC_TOKEN: ${{ secrets.SRC_TOKEN }}
+        run: |
+          set -u
+          mkdir -p src
+          fetch() {
+            rm -rf "src/$2"
+            if git clone -q --depth 1 --single-branch -b "$1" "https://x-access-token:${SRC_TOKEN}@github.com/janik4321sdfa/pinelab-gold-signal.git" "src/$2"; then
+              rm -rf "src/$2/.git"; echo "ok $1"
+            else
+              echo "::warning::branch $1 not available"; mkdir -p "src/$2"
+            fi
+          }
+          fetch signal-ledger sig
+          fetch tsy-ledger tsy
+          fetch demo-ledger demo
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: build
+        run: python build.py
+      - name: keep price cache
+        run: |
+          git config user.name "pinelab-dashboard"; git config user.email "dashboard@users.noreply.github.com"
+          git add cache/gc_60m.json
+          git diff --cached --quiet || (git commit -q -m "price cache" && git push -q) || echo "::warning::cache push failed"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
