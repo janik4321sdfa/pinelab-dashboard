@@ -121,7 +121,7 @@ def curve(rets):
 def stats_from(rets):
     xs = [r for _, r in rets]
     pts, cum, dd = curve(rets)
-    return {"n": len(xs), "cum_pct": cum, "maxdd_pct": dd, "win_pct": (100 * sum(x > 0 for x in xs) / len(xs)) if xs else None,
+    return {"n": len(xs), "cum_pct": cum, "maxdd_pct": dd, "win_pct": (100 * sum(x > 0 for x in xs) / max(1, sum(x != 0 for x in xs))) if any(x != 0 for x in xs) else None, "active": sum(x != 0 for x in xs),
             "last_pct": xs[-1] * 100 if xs else None, "avg_bp": statistics.mean(xs) * 1e4 if xs else None, "curve": pts}
 
 
