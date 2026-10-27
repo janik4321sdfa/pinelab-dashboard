@@ -12,7 +12,9 @@ NY = ZoneInfo("America/New_York"); CZ = ZoneInfo("Europe/Prague"); UTC = dt.time
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, "src"); OUT = os.path.join(ROOT, "site"); CACHE = os.path.join(ROOT, "cache", "gc_60m.json")
 EXITS = [3, 1, 23, 20]               # v5 exit_idx -> NY hour (as in the live code)
-FUT_COST = 0.40                      # USD/oz round trip, MGC main cost of the forward prereg
+CFD_COST = 0.50                      # USD/oz round trip, PurpleTrading CFD main cost (M4/M10)
+SWAP = 0.59                          # USD/oz per 17:00 NY rollover held (Wed x3) - only the 22:00 comparison pays it
+# M10 (2026-10-27): paper entry moved 16:00 NY -> broker reopen 18:00 NY (same as demo), CFD costs, no swap.
 PAPER_START = dt.date(2026, 10, 5)   # first night with R19/R21 cloud ledger
 ARMS = [("v5", "v5 (hlavní model)", "#4f8cff"), ("R043", "R043 (opatrnější v rizikových nocích)", "#a879ff"),
         ("R045", "R045 (mírně opatrnější)", "#ff8bd0"), ("R20C", "R20C (odpolední tilt)", "#3fd0c9")]
@@ -94,8 +96,9 @@ def paper_book(nights, px):
             rows.append({"D": str(D), "state": "NO_SIGNAL" if "NO_SIGNAL_POSTED" in n["events"] or "NO_SIGNAL" in n["events"] else "BEZ ZÁZNAMU"})
             continue
         h = EXITS[int(P.get("exit_idx", 0))]; xd = exit_dt(D, h)
-        E = px.get(hk(D, 16)); X = px.get(xd.strftime("%Y-%m-%dT%H")); G3 = px.get(exit_dt(D, 3).strftime("%Y-%m-%dT%H"))
-        row = {"D": str(D), "dow": DOW[D.weekday()], "exit_ny": h, "exit_cz": cz_short(xd.astimezone(CZ)),
+        ro = reopen(D); E = px.get(ro.strftime("%Y-%m-%dT%H")); E16 = px.get(hk(D, 16))
+        X = px.get(xd.strftime("%Y-%m-%dT%H")); G3 = px.get(exit_dt(D, 3).strftime("%Y-%m-%dT%H"))
+        row = {"D": str(D), "dow": DOW[D.weekday()], "exit_ny": h, "exit_cz": cz_short(xd.astimezone(CZ)), "entry_cz": cz_short(ro.astimezone(CZ)),
                "dec": P.get("dec_v5"), "paka": {}, "ret": {}}
         pk = {"v5": P.get("v5_paka")}
         for a in ("R043", "R045", "R20C"):
@@ -105,8 +108,11 @@ def paper_book(nights, px):
             row["state"] = "UZAVŘENO"
             for a, p in pk.items():
                 if p is None: continue
-                row["ret"][a] = p * (X / E - 1) - p * FUT_COST / E
+                row["ret"][a] = p * (X / E - 1) - p * CFD_COST / E
             if G3: row["ret"]["gold"] = G3 / E - 1
+            if E16 and pk.get("v5") is not None:
+                roll = 3 if D.weekday() == 2 else 1; p = pk["v5"]
+                row["ret"]["v5_22"] = p * (X / E16 - 1) - p * CFD_COST / E16 - p * SWAP * roll / E16
         else:
             row["state"] = "OTEVŘENO" if xd > now_utc() else "CHYBÍ CENY"
         rows.append(row)
@@ -203,7 +209,7 @@ def main():
     nights = signal_nights()
     book = paper_book(nights, px)
     paper = {}
-    for a, name, col in ARMS + [("gold", "Zlato 1× noc (srovnání, bez nákladů)", "#c9a227")]:
+    for a, name, col in ARMS + [("gold", "Zlato 1× noc 18→03 NY (srovnání, bez nákladů)", "#c9a227"), ("v5_22", "v5 s nákupem 22:00 (CFD se swapem, srovnání)", "#7d8597")]:
         rets = [(r["D"], r["ret"][a]) for r in book if a in r.get("ret", {})]
         s = stats_from(rets); s.update(name=name, color=col); paper[a] = s
     last = next((r for r in reversed(book) if r.get("paka")), None)
@@ -214,7 +220,7 @@ def main():
         "built_cz": now_utc().astimezone(CZ).strftime("%d.%m.%Y %H:%M"),
         "prices_ok": px_ok, "paper": paper, "book": book[::-1][:40], "tonight": last,
         "demo_gold": demo_gold(), "demo_index": demo_index(), "d040": d040(),
-        "heartbeat": hb, "cloud": cloud,
+        "heartbeat": hb, "cloud": cloud, "m10": jload(os.path.join(ROOT, "research", "m10.json")),
         "last_signal": max((str(D) for D, n in nights.items() if n["posted"]), default=None),
     }
     os.makedirs(OUT, exist_ok=True)
