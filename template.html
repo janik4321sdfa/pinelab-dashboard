@@ -51,7 +51,7 @@ tr:last-child td{border-bottom:0}
 <div class="grid g4" id="kpis"></div>
 
 <div class="grid g2 section">
-  <div class="card"><h2>Vývoj papírových strategií zlata (forward, od 5. 10. 2026) <span class="tag">% účtu, náklady 0.40 USD/oz</span></h2>
+  <div class="card"><h2>Vývoj papírových strategií zlata (forward, od 5. 10. 2026) <span class="tag">% účtu · nákup na otevíračce 18:00 NY · CFD náklad 0.50 USD/oz</span></h2>
     <svg class="chart" id="ch_paper"></svg><div class="legend" id="lg_paper"></div></div>
   <div class="card"><h2>Dnešní noc</h2><div id="tonight"></div></div>
 </div>
@@ -65,6 +65,8 @@ tr:last-child td{border-bottom:0}
   <div class="card"><h2>DEMO · Indexy noc a-015 (MT5) <span class="tag">US500 + US100</span></h2>
     <svg class="chart" id="ch_index" style="height:200px"></svg><div id="index_info"></div></div>
 </div>
+
+<div class="card section"><h2>Výzkum: kdy nakupovat? <span class="tag">M10 · 5 agentů + soudce · předem zamčené pravidlo · data 2007–2019</span></h2><div id="m10"></div></div>
 
 <div class="grid g2 section">
   <div class="card"><h2>Poslední noci (papír)</h2><div class="scroll"><table id="t_book"></table></div></div>
@@ -125,7 +127,7 @@ function chart(svgId,series,legId){
   if(legId)$(legId).innerHTML=series.map(s=>`<span><span class="dot" style="background:${s.color}"></span>${s.name} <b class="${cls(s.pts.length?s.pts[s.pts.length-1][1]:null)}">${s.pts.length?f(s.pts[s.pts.length-1][1])+' %':'–'}</b></span>`).join('');
 }
 function drawAll(){
-  const ser=['v5','R043','R045','R20C','gold'].map(a=>({name:D.paper[a].name.split(' (')[0],color:D.paper[a].color,pts:D.paper[a].curve,dash:a=='gold',w:a=='v5'?2.6:1.6}));
+  const ser=['v5','R043','R045','R20C','gold','v5_22'].map(a=>({name:a=='v5_22'?'v5 nákup 22:00':(a=='gold'?'Zlato 1×':D.paper[a].name.split(' (')[0]),color:D.paper[a].color,pts:D.paper[a].curve,dash:a=='gold'||a=='v5_22',w:a=='v5'?2.6:1.6}));
   chart('ch_paper',ser,'lg_paper');
   chart('ch_gold',[{name:'demo zlato',color:'#c9a227',pts:D.demo_gold.curve,w:2.4}]);
   chart('ch_index',[{name:'demo indexy',color:'#4f8cff',pts:D.demo_index.curve,w:2.4}]);
@@ -136,7 +138,7 @@ drawAll();addEventListener('resize',()=>{clearTimeout(window._t);window._t=setTi
   const t=D.tonight;if(!t){$('tonight').innerHTML='<div class="mut">Zatím žádný signál.</div>';return}
   const st={'UZAVŘENO':'ok','OTEVŘENO':'warn'}[t.state]||'bad';
   let h=`<div class="row"><span>Noc</span><span class="big">${t.D} <span class="pill ${st}">${t.state}</span></span></div>`;
-  h+=`<div class="row"><span>Nákup (papír)</span><span>22:00 CZ · 16:00 NY</span></div><div class="row"><span>Prodej</span><span>${t.exit_cz} CZ · ${String(t.exit_ny).padStart(2,'0')}:00 NY</span></div>`;
+  h+=`<div class="row"><span>Nákup (otevíračka)</span><span>${t.entry_cz||""} CZ · 18:00 NY</span></div><div class="row"><span>Prodej</span><span>${t.exit_cz} CZ · ${String(t.exit_ny).padStart(2,'0')}:00 NY</span></div>`;
   h+=`<div class="row"><span>Síla signálu v5</span><span>${t.dec==null?'–':t.dec.toFixed(2)} / 2</span></div>`;
   for(const a of ['v5','R043','R045','R20C'])h+=`<div class="row"><span>Páka ${a}</span><span>${t.paka[a]==null?'–':t.paka[a].toFixed(3)+'×'}</span></div>`;
   const og=D.demo_gold.open,oi=D.demo_index.open;
@@ -147,8 +149,9 @@ drawAll();addEventListener('resize',()=>{clearTimeout(window._t);window._t=setTi
 // all strategies
 (function(){
   const r=[];const P=D.paper;
-  for(const a of ['v5','R043','R045','R20C'])r.push([`<span class="dot" style="background:${P[a].color}"></span>${P[a].name}`,'Papír','Zlato noc 22:00→exit',P[a].n,P[a].cum_pct,P[a].win_pct,P[a].maxdd_pct,P[a].last_pct,'běží']);
-  r.push([`<span class="dot" style="background:${P.gold.color}"></span>${P.gold.name}`,'Srovnání','Zlato 16→03 NY 1×',P.gold.n,P.gold.cum_pct,P.gold.win_pct,P.gold.maxdd_pct,P.gold.last_pct,'—']);
+  for(const a of ['v5','R043','R045','R20C'])r.push([`<span class="dot" style="background:${P[a].color}"></span>${P[a].name}`,'Papír','Zlato noc otevíračka 18:00 NY→exit',P[a].n,P[a].cum_pct,P[a].win_pct,P[a].maxdd_pct,P[a].last_pct,'běží']);
+  r.push([`<span class="dot" style="background:${P.v5_22.color}"></span>${P.v5_22.name}`,'Srovnání','v5, nákup 22:00 CZ, platí swap',P.v5_22.n,P.v5_22.cum_pct,P.v5_22.win_pct,P.v5_22.maxdd_pct,P.v5_22.last_pct,'—']);
+  r.push([`<span class="dot" style="background:${P.gold.color}"></span>${P.gold.name}`,'Srovnání','Zlato 18→03 NY 1×',P.gold.n,P.gold.cum_pct,P.gold.win_pct,P.gold.maxdd_pct,P.gold.last_pct,'—']);
   const dg=D.demo_gold,di=D.demo_index,d4=D.d040;
   r.push(['<span class="dot" style="background:#c9a227"></span>Zlato v5 po reopenu','Demo MT5','XAUUSD_ecn 23:00/00:00 CZ→exit v5',dg.n,dg.cum_pct,dg.win_pct,dg.maxdd_pct,dg.last_pct,dg.open?dg.open.phase:'čeká']);
   r.push(['<span class="dot" style="background:#4f8cff"></span>Indexy noc a-015','Demo MT5','US500+US100 18:01→09:00 NY',di.n,di.cum_pct,di.win_pct,di.maxdd_pct,di.last_pct,di.open?Object.values(di.open.legs||{}).join('/'):'čeká']);
@@ -159,10 +162,10 @@ drawAll();addEventListener('resize',()=>{clearTimeout(window._t);window._t=setTi
 // book
 (function(){
   const rows=D.book.slice(0,20);
-  $('t_book').innerHTML='<tr><th>Noc</th><th>Prodej CZ</th><th>Páka v5</th><th>v5</th><th>R043</th><th>R045</th><th>R20C</th><th>Zlato 1×</th></tr>'+
-  rows.map(r=>{if(!r.paka)return `<tr><td>${r.D}</td><td colspan="7" class="mut" style="text-align:left">${r.state}</td></tr>`;
+  $('t_book').innerHTML='<tr><th>Noc</th><th>Prodej CZ</th><th>Páka v5</th><th>v5</th><th>R043</th><th>R045</th><th>R20C</th><th>Zlato 1×</th><th>v5 22:00</th></tr>'+
+  rows.map(r=>{if(!r.paka)return `<tr><td>${r.D}</td><td colspan="8" class="mut" style="text-align:left">${r.state}</td></tr>`;
    const c=a=>r.ret&&r.ret[a]!=null?`<td class="${cls(r.ret[a])}">${f(r.ret[a]*100,2)} %</td>`:`<td class="mut">${r.state=='OTEVŘENO'?'běží':'–'}</td>`;
-   return `<tr><td>${r.D} <span class="mut">${r.dow}</span></td><td>${r.exit_cz}</td><td>${r.paka.v5==null?'–':r.paka.v5.toFixed(2)}×</td>${c('v5')}${c('R043')}${c('R045')}${c('R20C')}${c('gold')}</tr>`}).join('');
+   return `<tr><td>${r.D} <span class="mut">${r.dow}</span></td><td>${r.exit_cz}</td><td>${r.paka.v5==null?'–':r.paka.v5.toFixed(2)}×</td>${c('v5')}${c('R043')}${c('R045')}${c('R20C')}${c('gold')}${c('v5_22')}</tr>`}).join('');
 })();
 // demo infos
 (function(){
@@ -184,6 +187,26 @@ drawAll();addEventListener('resize',()=>{clearTimeout(window._t);window._t=setTi
   m+=d.windows.map(w=>`<div class="row"><span>${w.window}</span><span class="${cls(w.net_pct)}">${f(w.net_pct)} %</span></div>`).join('');
   $('d040').innerHTML=m;
 })();
-</script>
+// M10 research
+(function(){
+  const M=D.m10;if(!M){$('m10').innerHTML='<div class="mut">Zatím bez výsledků.</div>';return}
+  const v=M.verdict,pl=x=>x.change?'<span class="pill warn">ZMĚNA</span>':'<span class="pill ok">PONECHAT</span>';
+  const s=x=>x==null?'–':`<span class="${cls(x)}">${x.toFixed(2)}</span>`;
+  const hn={H16:'16:00 NY · 22:00 CZ',H17:'17:00 NY (před pauzou)',H18:'18:00 NY · otevíračka (23:00/00:00 CZ)',H19:'19:00 NY',H20:'20:00 NY · ~01:00–02:00 CZ',H21:'21:00 NY'};
+  let h=`<div class="grid g3" style="margin-bottom:12px">
+   <div class="card kpi"><div class="lab">Demo zlato (CFD)</div><div class="val" style="font-size:18px">${pl(v.gold_demo)} otevíračka 18:00 NY</div><div class="foot">čeká na spread ≤ 0.50, nejpozději 18:15</div></div>
+   <div class="card kpi"><div class="lab">Papírový signál zlata</div><div class="val" style="font-size:18px">${pl(v.gold_paper)} 22:00 → otevíračka</div><div class="foot">na CFD ušetří swap; na futures bez rozdílu</div></div>
+   <div class="card kpi"><div class="lab">Demo indexy</div><div class="val" style="font-size:18px">${pl(v.index_demo)} 18:01 NY</div><div class="foot">19:00 vypadalo lépe jen v letech 2011–14</div></div></div>`;
+  h+='<div class="grid g2"><div class="scroll"><table><tr><th>Zlato v5 – nákup v</th><th>CFD</th><th>CFD stress</th><th>Futures</th><th>CFD stress 07–09</th></tr>'+
+   M.gold_h1.map(r=>`<tr><td>${hn[r.entry]||r.entry}${r.entry=='H18'?' <span class="pill ok">nejlepší</span>':''}</td><td>${s(r.cfd_main)}</td><td>${s(r.cfd_stress)}</td><td>${s(r.fut_main)}</td><td>${s(r.conf_cfd_stress)}</td></tr>`).join('')+'</table>'+
+   '<div class="note" style="margin-top:6px">Sharpe 2010–2019 (vyšší = lepší). CFD = spread 0.50 USD/oz + swap, pokud se drží přes 23:00/00:00 CZ. Stress = dvojnásobný spread.</div></div>';
+  h+='<div class="scroll"><table><tr><th>Minuta po otevření</th><th>CFD</th><th>Stress</th><th>Spread brokera*</th><th>Spread ≤ 0.50</th></tr>'+
+   M.gold_m1.map(r=>`<tr><td>${r.minute=='G'?'pravidlo demo (G)':r.minute+' NY'}</td><td>${s(r.main)}</td><td>${s(r.stress)}</td><td>${r.broker_spread_med==null?'–':r.broker_spread_med.toFixed(2)+' USD'}</td><td>${r.pass_any==null?'–':Math.round(r.pass_any*100)+' %'}</td></tr>`).join('')+'</table>'+
+   `<div class="note" style="margin-top:6px">Zlato M1 2010–2019 se skutečným bid/ask. Každá minuta čekání stojí ~0.3 bp za noc. *Medián spreadu PurpleTrading za 8 týdnů (září–říjen 2026); v 16:00 NY je to ${M.spread_ref_1600==null?'–':M.spread_ref_1600.toFixed(2)} USD. První tick přijde ${Math.round(M.first_tick_sec)} s po otevření.</div></div></div>`;
+  h+='<div class="scroll" style="margin-top:12px"><table><tr><th>Indexy US500+US100 – nákup v</th><th>Sharpe</th><th>Stress</th><th>Ročně</th><th>Max propad</th></tr>'+
+   M.index.map(r=>`<tr><td>${hn[r.entry]||r.entry}${r.entry=='H18'?' (demo 18:01)':''}</td><td>${s(r.main)}</td><td>${s(r.stress)}</td><td>${f(r.ann_main,1)} %</td><td class="neg">${r.maxdd_main==null?'–':r.maxdd_main.toFixed(1)+' %'}</td></tr>`).join('')+'</table>'+
+   '<div class="note" style="margin-top:6px">Indexy 2011–2018 (výběrové období), prodej vždy 09:00 NY. 19:00 NY nebylo statisticky průkazné (p po Holmovi 0.11) a nemá potvrzovací data.</div></div>';
+  $('m10').innerHTML=h;
+})();</script>
 </body>
 </html>
