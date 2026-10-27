@@ -1,0 +1,220 @@
+{
+ "title": "M10 – čas nákupu (27. 10. 2026, 5 agentů + soudce, předem zamčené pravidlo)",
+ "verdict": {
+  "gold_demo": {
+   "current": "reopen 18:00 NY, pravidlo G (prvni minuta se spreadem <= 0.50, nejpozdeji 18:15)",
+   "recommended": "PONECHAT reopen 18:00 NY + pravidlo G",
+   "change": false
+  },
+  "gold_paper": {
+   "current": "16:00 NY (22:00 CZ)",
+   "recommended": "ZMENIT na 18:00 NY (reopen, stejne jako demo)",
+   "change": true
+  },
+  "index_demo": {
+   "current": "18:01 NY (US500+US100, exit 09:00 NY)",
+   "recommended": "PONECHAT 18:01 NY",
+   "change": false
+  }
+ },
+ "gold_h1": [
+  {
+   "entry": "H16",
+   "cfd_main": -0.842,
+   "cfd_stress": -2.098,
+   "fut_main": 1.828,
+   "conf_cfd_stress": -2.483,
+   "silver_cfd_stress": -5.015,
+   "ann_cfd_main": -6.6
+  },
+  {
+   "entry": "H17",
+   "cfd_main": -0.159,
+   "cfd_stress": -1.047,
+   "fut_main": 1.678,
+   "conf_cfd_stress": -2.458,
+   "silver_cfd_stress": -1.5,
+   "ann_cfd_main": -0.85
+  },
+  {
+   "entry": "H18",
+   "cfd_main": 1.315,
+   "cfd_stress": -0.031,
+   "fut_main": 1.851,
+   "conf_cfd_stress": 0.294,
+   "silver_cfd_stress": -2.497,
+   "ann_cfd_main": 9.58
+  },
+  {
+   "entry": "H19",
+   "cfd_main": 0.283,
+   "cfd_stress": -1.204,
+   "fut_main": 0.877,
+   "conf_cfd_stress": -0.985,
+   "silver_cfd_stress": -3.878,
+   "ann_cfd_main": 1.87
+  },
+  {
+   "entry": "H20",
+   "cfd_main": 0.322,
+   "cfd_stress": -0.777,
+   "fut_main": 0.761,
+   "conf_cfd_stress": -0.747,
+   "silver_cfd_stress": -1.512,
+   "ann_cfd_main": 2.0
+  },
+  {
+   "entry": "H21",
+   "cfd_main": -0.129,
+   "cfd_stress": -1.322,
+   "fut_main": 0.35,
+   "conf_cfd_stress": -1.475,
+   "silver_cfd_stress": -2.056,
+   "ann_cfd_main": -0.73
+  }
+ ],
+ "gold_m1": [
+  {
+   "minute": "18:00",
+   "main": 0.817,
+   "stress": 0.135,
+   "conf_stress": 0.459,
+   "broker_spread_med": 1.0425000000002456,
+   "broker_spread_p90": 1.6720000000000255,
+   "pass_any": 0.525
+  },
+  {
+   "minute": "18:01",
+   "main": 0.672,
+   "stress": -0.016,
+   "conf_stress": 0.252,
+   "broker_spread_med": 0.9649999999996908,
+   "broker_spread_p90": 1.5969999999992979,
+   "pass_any": 0.575
+  },
+  {
+   "minute": "18:02",
+   "main": 0.566,
+   "stress": -0.125,
+   "conf_stress": 0.114,
+   "broker_spread_med": 0.9200000000000728,
+   "broker_spread_p90": 1.4499999999999091,
+   "pass_any": 0.55
+  },
+  {
+   "minute": "18:03",
+   "main": 0.458,
+   "stress": -0.234,
+   "conf_stress": 0.054,
+   "broker_spread_med": 0.8350000000000364,
+   "broker_spread_p90": 1.2555000000001204,
+   "pass_any": 0.55
+  },
+  {
+   "minute": "18:05",
+   "main": 0.361,
+   "stress": -0.34,
+   "conf_stress": -0.046,
+   "broker_spread_med": 0.6199999999998909,
+   "broker_spread_p90": 1.031999999999789,
+   "pass_any": 0.65
+  },
+  {
+   "minute": "18:10",
+   "main": 0.321,
+   "stress": -0.381,
+   "conf_stress": -0.152,
+   "broker_spread_med": 0.5799999999999272,
+   "broker_spread_p90": 0.8815000000000964,
+   "pass_any": 0.775
+  },
+  {
+   "minute": "18:15",
+   "main": 0.224,
+   "stress": -0.48,
+   "conf_stress": -0.308,
+   "broker_spread_med": 0.5399999999999636,
+   "broker_spread_p90": 0.8729999999998654,
+   "pass_any": 0.825
+  },
+  {
+   "minute": "18:30",
+   "main": 0.233,
+   "stress": -0.478,
+   "conf_stress": -0.146,
+   "broker_spread_med": 0.5499999999999545,
+   "broker_spread_p90": 0.8309999999999491,
+   "pass_any": 0.825
+  },
+  {
+   "minute": "18:45",
+   "main": 0.229,
+   "stress": -0.492,
+   "conf_stress": -0.324,
+   "broker_spread_med": 0.5099999999997635,
+   "broker_spread_p90": 0.7730000000004111,
+   "pass_any": 0.875
+  },
+  {
+   "minute": "19:00",
+   "main": 0.247,
+   "stress": -0.496,
+   "conf_stress": -0.414,
+   "broker_spread_med": 0.5250000000005457,
+   "broker_spread_p90": 0.769999999999618,
+   "pass_any": 0.875
+  },
+  {
+   "minute": "G",
+   "main": 0.667,
+   "stress": -0.024,
+   "conf_stress": 0.397,
+   "broker_spread_med": null,
+   "broker_spread_p90": null,
+   "pass_any": null
+  }
+ ],
+ "index": [
+  {
+   "entry": "H16",
+   "main": 0.552,
+   "stress": 0.1,
+   "ann_main": 4.82,
+   "maxdd_main": -13.9
+  },
+  {
+   "entry": "H18",
+   "main": 0.904,
+   "stress": 0.637,
+   "ann_main": 7.32,
+   "maxdd_main": -9.09
+  },
+  {
+   "entry": "H19",
+   "main": 1.065,
+   "stress": 0.795,
+   "ann_main": 8.53,
+   "maxdd_main": -9.75
+  },
+  {
+   "entry": "H20",
+   "main": 0.885,
+   "stress": 0.608,
+   "ann_main": 6.9,
+   "maxdd_main": -9.89
+  },
+  {
+   "entry": "H21",
+   "main": 0.928,
+   "stress": 0.64,
+   "ann_main": 6.95,
+   "maxdd_main": -12.23
+  }
+ ],
+ "spread_ref_1600": 0.3899999999996453,
+ "first_tick_sec": 15.043499999999767,
+ "index_spread": {
+  "US500_ecn": 0.4600000000000364,
+  "US100_ecn": 1.2000000000007276
+ }
+}
